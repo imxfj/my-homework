@@ -1,16 +1,17 @@
 # 作者123
-# 开发时间：
+# 开发时间：2023.10.1-
 import json
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import re
+from docx import Document
 #每次爬取就改变这两个参数  a1='从零开始数的课程位数',n7='你想从哪个数排列你的作业'
 a1=input('从零开始数的课程位数')
 a1=int(a1)
 n7=input('你想从哪个数排列你的作业')
 n7=int(n7)
-
+n8=input('输入作业保存的路径')
 
 
 #以下为往登录界面注入课程界面的cookie并跳转到课程界面的代码
@@ -81,7 +82,7 @@ page_num=len(page_link)
 element1 = wb.find_element(By.XPATH, '//*[@id="pageSize_select"]')
 wb.execute_script("arguments[0].scrollIntoView();", element1)
 element1.click()
-time.sleep(2)
+time.sleep(3)
 element2 = wb.find_element(By.XPATH, '//*[@id="pageSize_select"]/option[3]')
 element2.click()
 time.sleep(2)
@@ -96,6 +97,7 @@ while True:
     wb.switch_to.frame(iframe)
     iframe = wb.find_element(By.ID, 'examIframe')
     wb.switch_to.frame(iframe)
+    time.sleep(10)
     homework_num = wb.find_element(By.XPATH, '//*[@id="rowCount"]').text  # 作业条数
     n4 = wb.find_elements(By.XPATH, '//*[@name="viewrecord_btn"]')  #一页中查看作业的按钮列表(这个name值可以获取进行中和已结束的作业列表)
     #以下为找到对应的查看作业按钮并点击
@@ -113,8 +115,12 @@ while True:
     #以下为处理文本
     text=homework
     res1 = re.sub("．\n", ' ', text)
-    with open(fr'D:\pythonProject\zhijiaoyun\get_homework\诊断学\{n7}{homework_title}.docx', 'w', encoding='utf-8') as f:
-                 f.write(homework_title + res1)
+    # with open(fr'D:\pythonProject\zhijiaoyun\get_homework\诊断学\{n7}{homework_title}.docx', 'w', encoding='utf-8') as f:
+    #              f.write(homework_title + res1)
+    document = Document()
+    paragraph1 = document.add_paragraph(homework_title)
+    paragraph2 = document.add_paragraph(res1)
+    document.save(fr'{n8}\{n7}{homework_title}.docx')
     print(homework_title+'已保存')
     wb.close()   #此行为写入作业后关闭查看作业的页面
     wb.switch_to.window(wb.window_handles[1])
